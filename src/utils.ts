@@ -38,7 +38,7 @@ export const textPrettify = (text: string) => {
 
 export function getAbsoluteUrl() {
   if (typeof window !== "undefined") return "";
-  if (process.env.VERCEL_URL) return `https://www.easycook.app`;
+  if (process.env.VERCEL_URL) return `https://www.subscription-manager.app`;
   return `http://localhost:${process.env.PORT ?? 3000}`;
 }
 
