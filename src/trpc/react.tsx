@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
 
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
@@ -57,11 +58,13 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
           },
         }),
       ],
-    })
+    }),
   );
 
   return (
     <QueryClientProvider client={queryClient}>
+      {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+      {/* @ts-expect-error */}
       <api.Provider client={trpcClient} queryClient={queryClient}>
         {props.children}
       </api.Provider>

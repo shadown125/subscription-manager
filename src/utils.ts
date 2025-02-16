@@ -14,6 +14,8 @@ const COMMON_UNITS = ["small", "medium", "large"];
 const twMerge = extendTailwindMerge({
   extend: {
     theme: {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
       opacity: ["disabled"],
       spacing: ["divider"],
       borderWidth: COMMON_UNITS,
