@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://www.subscription-manager.app/
+
+# Sitemaps
+Sitemap: https://www.subscription-manager.app/sitemap.xml
