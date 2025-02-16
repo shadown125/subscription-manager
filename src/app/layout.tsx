@@ -11,6 +11,7 @@ import { auth } from "@/server/auth";
 import SignupForm from "./_components/signup-form";
 import LoginForm from "./_components/login-form";
 import { Toaster } from "react-hot-toast";
+import { Analytics } from "@vercel/analytics/react";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -99,6 +100,7 @@ export default async function RootLayout({
             <Toaster />
           </Providers>
         </TRPCReactProvider>
+        <Analytics />
       </body>
     </html>
   );
