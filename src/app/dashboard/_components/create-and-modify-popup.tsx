@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Input,
@@ -18,7 +18,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import toast from "react-hot-toast";
 import { api } from "@/trpc/react";
-import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
+import {
+  getLocalTimeZone,
+  parseDate,
+  today,
+  type CalendarDate,
+} from "@internationalized/date";
 import {
   type BillingTypeOptions,
   billingTypeOptions,
@@ -69,23 +74,12 @@ export default function CreateAndModifyPopup() {
     });
 
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [date, setDate] = useState(
-    currentSubscription
-      ? parseDate(currentSubscription.billingDate)
-      : today(getLocalTimeZone()),
-  );
-  const [billingType, setBillingType] = useState<BillingTypeOptions>(
-    currentSubscription ? currentSubscription.billingType : "CREDIT_CARD",
-  );
-  const [currency, setCurrency] = useState<CurrencyOptions>(
-    currentSubscription ? currentSubscription.currency : "USD",
-  );
-  const [period, setPeriod] = useState<PeriodOptions>(
-    currentSubscription ? currentSubscription.period : "MONTHLY",
-  );
-  const [status, setStatus] = useState<StatusOptions>(
-    currentSubscription ? currentSubscription.status : "ACTIVE",
-  );
+  const [date, setDate] = useState<CalendarDate>(today(getLocalTimeZone()));
+  const [billingType, setBillingType] =
+    useState<BillingTypeOptions>("CREDIT_CARD");
+  const [currency, setCurrency] = useState<CurrencyOptions>("USD");
+  const [period, setPeriod] = useState<PeriodOptions>("MONTHLY");
+  const [status, setStatus] = useState<StatusOptions>("ACTIVE");
 
   const { mutate: subscriptionCreate } = api.subscription.create.useMutation();
   const { mutate: subscriptionUpdate } = api.subscription.update.useMutation();
@@ -94,10 +88,38 @@ export default function CreateAndModifyPopup() {
     reset,
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<SubscriptionSchema>({
     resolver: zodResolver(subscriptionSchema),
+    defaultValues: {
+      subscriptionName: "",
+      price: "",
+    },
   });
+
+  const subscriptionName = watch("subscriptionName");
+  const price = watch("price");
+
+  useEffect(() => {
+    if (currentSubscription) {
+      setValue("subscriptionName", currentSubscription.name);
+      setValue("price", currentSubscription.price.toString());
+      setDate(parseDate(currentSubscription.billingDate));
+      setBillingType(currentSubscription.billingType);
+      setCurrency(currentSubscription.currency);
+      setPeriod(currentSubscription.period);
+      setStatus(currentSubscription.status);
+    } else {
+      reset();
+      setDate(today(getLocalTimeZone()));
+      setBillingType("CREDIT_CARD");
+      setCurrency("USD");
+      setPeriod("MONTHLY");
+      setStatus("ACTIVE");
+    }
+  }, [currentSubscription, setValue, reset]);
 
   const onSubmit: SubmitHandler<SubscriptionSchema> = async (data) => {
     try {
@@ -197,11 +219,11 @@ export default function CreateAndModifyPopup() {
             <div className="flex w-full max-w-3xl flex-col gap-4 rounded-large bg-content1 py-10 pb-6">
               {isLoading ? (
                 <>
-                  <Skeleton className="h-5 w-full" />
-                  <Skeleton className="h-5 w-full" />
-                  <Skeleton className="h-5 w-full" />
-                  <Skeleton className="h-5 w-full" />
-                  <Skeleton className="h-5 w-full" />
+                  <Skeleton className="h-10 w-full rounded-lg" />
+                  <Skeleton className="h-10 w-full rounded-lg" />
+                  <Skeleton className="h-10 w-full rounded-lg" />
+                  <Skeleton className="h-10 w-full rounded-lg" />
+                  <Skeleton className="h-10 w-full rounded-lg" />
                 </>
               ) : (
                 <form
@@ -213,7 +235,7 @@ export default function CreateAndModifyPopup() {
                     autoFocus
                     isRequired
                     label={"Subscription name"}
-                    defaultValue={currentSubscription?.name}
+                    value={subscriptionName}
                     type="text"
                     variant="bordered"
                     isInvalid={!!errors.subscriptionName}
@@ -227,7 +249,7 @@ export default function CreateAndModifyPopup() {
                     <Select
                       variant="bordered"
                       className="max-w-xs"
-                      defaultSelectedKeys={[currency]}
+                      selectedKeys={[currency]}
                       disallowEmptySelection
                       label="Select currency"
                       onChange={(e) =>
@@ -245,7 +267,7 @@ export default function CreateAndModifyPopup() {
                       label={"Price"}
                       type="number"
                       variant="bordered"
-                      defaultValue={currentSubscription?.price.toString()}
+                      value={price}
                       isInvalid={!!errors.price}
                       errorMessage={
                         errors.price?.message && errors.price.message
@@ -258,7 +280,7 @@ export default function CreateAndModifyPopup() {
                     variant={"bordered"}
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
-                    defaultValue={date}
+                    value={date}
                     onChange={(date) => {
                       if (date) {
                         setDate(date);
@@ -269,7 +291,7 @@ export default function CreateAndModifyPopup() {
                     <Select
                       variant="bordered"
                       className="max-w-xs"
-                      defaultSelectedKeys={[status]}
+                      selectedKeys={[status]}
                       disallowEmptySelection
                       label="Select status"
                       onChange={(e) =>
@@ -283,7 +305,7 @@ export default function CreateAndModifyPopup() {
                     <Select
                       variant="bordered"
                       className="max-w-xs"
-                      defaultSelectedKeys={[period]}
+                      selectedKeys={[period]}
                       disallowEmptySelection
                       label="Select period"
                       onChange={(e) =>
@@ -297,7 +319,7 @@ export default function CreateAndModifyPopup() {
                   </div>
                   <Select
                     variant="bordered"
-                    defaultSelectedKeys={[billingType]}
+                    selectedKeys={[billingType]}
                     label="Select billing type"
                     disallowEmptySelection
                     onChange={(e) =>
