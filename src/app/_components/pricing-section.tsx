@@ -101,8 +101,8 @@ export default function PricingSection({
       description: "Unlimited access to all features",
       href: "#",
       mostPopular: true,
-      pricePromotion: "$9.99",
-      price: "$4.99",
+      // pricePromotion: "$9.99",
+      price: "Free",
       featured: true,
       features: [
         "Create unlimited subscriptions",
@@ -113,7 +113,7 @@ export default function PricingSection({
       buttonText: "Get started",
       buttonColor: "primary",
       buttonVariant: "solid",
-      onClick: session ? handleStripeSessionClick : handleClick,
+      onClick: session ? () => router.push("/dashboard") : handleClick,
     },
   ];
 

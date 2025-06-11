@@ -138,7 +138,7 @@ export default function SignupForm() {
           async onSuccess() {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             await signIn("credentials", {
-              callbackUrl: "/",
+              callbackUrl: "/dashboard",
               email: email,
               password: password,
             });
@@ -333,9 +333,9 @@ export default function SignupForm() {
                             <Icon icon="flat-color-icons:google" width={24} />
                           }
                           variant="flat"
-                          onClick={async () => {
+                          onPress={async () => {
                             await signIn("google", {
-                              redirect: false,
+                              redirectTo: "/dashboard",
                             });
                           }}
                         >
@@ -351,9 +351,9 @@ export default function SignupForm() {
                             />
                           }
                           variant="flat"
-                          onClick={async () => {
+                          onPress={async () => {
                             await signIn("discord", {
-                              redirect: false,
+                              callbackUrl: "/dashboard",
                             });
                           }}
                         >
@@ -363,7 +363,7 @@ export default function SignupForm() {
                           Already have an account?&nbsp;
                           <Link
                             className="cursor-pointer"
-                            onClick={handleClick}
+                            onPress={handleClick}
                             size="sm"
                           >
                             Log In
